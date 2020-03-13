@@ -1,4 +1,3 @@
-package app;
 import java.awt.Font;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -18,7 +17,7 @@ public class View extends JFrame {
 	private JPanel contentPane;
 	private JLabel lblNewLabel,lblNewLabel_1,lblNewLabel_2,lblNewLabel_3,lblNewLabel_4,lblNewLabel_5,lblNewLabel_6,lblNewLabel_7,lblNewLabel_8,lblNewLabel_9,
 	lblNewLabel_10,lblNewLabel_11,lblNewLabel_12,lblNewLabel_13,lblNewLabel_14;
-	private tempController controller;
+	private Controller controller;
 	private ButtonGroup bGroup;
 	private JRadioButton rdbtnNewRadioButton, rdbtnNewRadioButton_1,rdbtnNewRadioButton_2;
 	private JButton btnNewButton,btnNewButton_1;
@@ -26,7 +25,7 @@ public class View extends JFrame {
 	/**
 	 * Create the frame.
 	 */
-	public View(int labels, tempController controller) {
+	public View(int labels, Controller controller) {
 		this.controller = controller;
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 1106, 739);

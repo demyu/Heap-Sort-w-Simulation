@@ -1,4 +1,3 @@
-package app;
 import java.awt.EventQueue;
 /**
  * Runner
@@ -6,6 +5,6 @@ import java.awt.EventQueue;
 public class Runner {
 
     public static void main(String[] args) {
-		tempController j = new tempController();
+		Controller j = new Controller();
 	}
 }

@@ -1,9 +1,8 @@
-package app;
-
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Queue;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import javax.swing.Timer;
 
@@ -16,7 +15,7 @@ import java.awt.Dimension;
 /**
  * Controller
  */
-public class Controller extends Thread implements ActionListener {
+public class Controller implements ActionListener {
 
     private View view;
     private Timer time;
@@ -25,15 +24,16 @@ public class Controller extends Thread implements ActionListener {
     private double[] oldLocations;
     private boolean isAnimating = true;
     private ArrayList<theQueue> queue;
-    private int globally = 0;
+    private int globally = 0, globally_1 = 0;
 
     public Controller() {
         this.heap = new Heap();
-        //this.view = new View(heap.getArray().length, this);
+        this.view = new View(heap.getArray().length, this);
         for (int i = 0; i < heap.getArray().length; i++) {
             view.getLabels()[i].setText(Integer.toString(heap.getArray()[i]));
             Dimension d = new Dimension(120, 16);
             view.getLabels()[i].setMaximumSize(d);
+            view.getLabels()[i].setName(Integer.toString(i));
             view.repaint();
         }
         this.queue = new ArrayList<theQueue>();
@@ -60,8 +60,7 @@ public class Controller extends Thread implements ActionListener {
                         timerListener(e);
                     }
                 });
-                heapSort(heap.getArray(), heap.getArray().length);
-
+                heapSort(heap.getArray());
                 // Todo
 
                 view.getButtons()[1].setText("Stop");
@@ -79,11 +78,9 @@ public class Controller extends Thread implements ActionListener {
         }
     }
 
-    public void swapper(JLabel l1, JLabel l2, double[] oldLocations) {
+    public void swapper(JLabel l1, JLabel l2, double[] oldLocations, int i1, int i2) {
         Rectangle label1 = l1.getBounds();
         Rectangle label2 = l2.getBounds();
-        Rectangle oldLabel1 = l1.getBounds();
-        Rectangle oldLabel2 = l2.getBounds();
 
         double x1 = label1.getX();
         double oldX1 = oldLocations[0];
@@ -97,32 +94,34 @@ public class Controller extends Thread implements ActionListener {
         // Todo
         if (0 == (oldX1 - x2) && 0 == (oldY1 - y2) && 0 == (x1 - oldX2) && 0 == (y1 - oldY2)) {
             globally += 1;
+            innerSwap(i1, i2);
         }
-
-        if (0 < (oldX1 - x2)) {
-            x2 += speed;
-            label2.setBounds((int) x2, (int) label2.getY(), (int) label2.getWidth(), (int) label2.getHeight());
-            l2.setBounds(label2);
-            view.repaint();
-        }
-        if (0 > (oldX1 - x2)) {
-            x2 -= speed;
-            label2.setBounds((int) x2, (int) label2.getY(), (int) label2.getWidth(), (int) label2.getHeight());
-            l2.setBounds(label2);
-            view.repaint();
-        }
-        if (0 < (oldY1 - y2)) {
-            y2 += speed;
-            label2.setBounds((int) label2.getX(), (int) y2, (int) label2.getWidth(), (int) label2.getHeight());
-            l2.setBounds(label2);
-            view.repaint();
-        }
-        if (0 > (oldY1 - y2)) {
-            y2 -= speed;
-            label2.setBounds((int) label2.getX(), (int) y2, (int) label2.getWidth(), (int) label2.getHeight());
-            l2.setBounds(label2);
-            view.repaint();
-        }
+        l1.setText(l1.getText());
+        l2.setText(l2.getText());
+                        if (0 < (oldX1 - x2)) {
+                            x2 += speed;
+                            label2.setBounds((int) x2, (int) label2.getY(), (int) label2.getWidth(), (int) label2.getHeight());
+                            l2.setBounds(label2);
+                            view.repaint();
+                        }
+                        if (0 > (oldX1 - x2)) {
+                            x2 -= speed;
+                            label2.setBounds((int) x2, (int) label2.getY(), (int) label2.getWidth(), (int) label2.getHeight());
+                            l2.setBounds(label2);
+                            view.repaint();
+                        }
+                        if (0 < (oldY1 - y2)) {
+                            y2 += speed;
+                            label2.setBounds((int) label2.getX(), (int) y2, (int) label2.getWidth(), (int) label2.getHeight());
+                            l2.setBounds(label2);
+                            view.repaint();
+                        }
+                        if (0 > (oldY1 - y2)) {
+                            y2 -= speed;
+                            label2.setBounds((int) label2.getX(), (int) y2, (int) label2.getWidth(), (int) label2.getHeight());
+                            l2.setBounds(label2);
+                            view.repaint();
+                        }
 
         if (0 < (x1 - oldX2)) {
             x1 -= speed;
@@ -152,81 +151,94 @@ public class Controller extends Thread implements ActionListener {
     }
 
     public void timerListener(ActionEvent e) {
-            if(globally!=queue.size()){
+            if(globally!=queue.size() ){
                 theQueue q = queue.get(globally);
-                swapper(view.getLabels()[q.getI()], view.getLabels()[q.getK()], q.getOldValues());
-            }else{
-                time.stop();
+                swapper(view.getLabels()[q.getI()], view.getLabels()[q.getK()], q.getOldValues(), q.getI(), q.getK());
             }
     }
 
-    public void buildMaxHeap(int arr[], int n) {
-        for (int i = 1; i < n; i++) {
-            // if child is bigger than parent
-            if (arr[i] > arr[(i - 1) / 2]) {
-                int j = i;
-
-                // swap child and parent until
-                // parent is smaller
-                while (arr[j] > arr[(j - 1) / 2]) {
-                    swap(arr, j, (j - 1) / 2);
-                    j = (j - 1) / 2;
-                }
-
-            }
+    public int[] heapSort(int[] array) {
+        // Creating heap
+        int middle = array.length / 2 - 1;
+        for (int i = middle; i >= 0; i--) {
+         int leftChild = array[i * 2 + 1];
+         // If there is not right child it will be equal to left child
+         int rightChildren = array[i * 2 + (i * 2 + 2 < array.length ? 2 : 1)];
+         // "Sift" current element if it is less than one of its children
+         if (array[i] < Math.max(leftChild, rightChildren)) {
+          array = sift(i, array, array.length);
+         }
         }
+        // Sorting array
+        // Right bound of unsorted part of array
+        int rightBound = array.length;
+        while (rightBound > 0) {
+         // Changing positions of the first and the last elements
+         array = swap(0, rightBound - 1, array);
+         rightBound--;
+         // Sifting new first element considering decremented right bound
+         array = sift(0, array, rightBound);
+        }
+        time.start();
+        System.out.println(Arrays.toString(array));
+        for (int i = 0; i < queue.size(); i++) {
+            queue.get(i).toStr();
+        }
+        return array;
+       }
+      
+       public int[] sift(int index, int[] array, int rightBound) {
+        // Iterate while element has at least one child
+        while (index * 2 + 1 < rightBound) {
+         int leftChild = array[index * 2 + 1];
+         int rightChild = array[index * 2 + (index * 2 + 2 < rightBound ? 2 : 1)];
+         // If left child is bigger than left and current element we need to
+         // swap current with left child and go to the next iteration
+         if (leftChild >= rightChild && leftChild > array[index]) {
+          array = swap(index, index * 2 + 1, array);
+          index = index * 2 + 1;
+          continue;
+         }
+         // If right child is greater than current - swap and go to the next
+         if (rightChild > array[index]) {
+          array = swap(index, index * 2 + 2, array);
+          index = index * 2 + 2;
+          continue;
+         }
+         // Since we got here, current element is bigger than it children, so we
+         // don't need to iterate more
+         break;
+        }
+        return array;
+       }
+      
+   // Change positions of two elements with indicies i1 and i2 in array
+
+    public int[] swap(int i1, int i2, int[] array) {
+
+        oldLocations = new double[] { view.getLabels()[i1].getX(), view.getLabels()[i1].getY(),view.getLabels()[i2].getX(), view.getLabels()[i2].getY()};
+        queue.add(new theQueue(i1, i2, oldLocations));
+        
+        int temp = array[i1];
+        array[i1] = array[i2];
+        array[i2] = temp;
+        return array;
+    } 
+
+    public void innerSwap(int i1,int i2){
+        JLabel[] k = new JLabel[view.getLabels().length];
+        for (int i = 0; i < k.length; i++) {
+            k[i] = view.getLabels()[i];
+        }
+
+        System.out.print(k[i1].getText());
+        JLabel lTemp = k[i1];
+        k[i1]=k[i2];
+        System.out.print(k[i1].getText());
+        k[i2]=lTemp;
+        view.setLabels(k);
+
+        System.out.println(" ");
+        view.repaint();
     }
-
-    public void swap(int[] a, int i, int j) {
-
-        oldLocations = new double[] { view.getLabels()[i].getX(), view.getLabels()[i].getY(),
-                view.getLabels()[j].getX(), view.getLabels()[j].getY() };
-        
-        queue.add(new theQueue(i, j, oldLocations));
-        
-        JLabel lTemp = view.getLabels()[i];
-        view.getLabels()[i]=view.getLabels()[j];
-        view.getLabels()[j] = lTemp;
-
-        int temp = a[i]; 
-        a[i]=a[j]; 
-        a[j]=temp;
-    } 
-
-    public void heapSort(int arr[], int n) 
-    { 
-      buildMaxHeap(arr, n); 
-    
-      for (int i = n - 1; i > 0; i--) 
-      { 
-        // swap value of first indexed 
-        // with last indexed 
-        swap(arr, 0, i); 
-        // maintaining heap property 
-        // after each swapping 
-        int j = 0, index; 
-    
-        do
-        { 
-          index = (2 * j + 1); 
-    
-          // if left child is smaller than 
-          // right child point index variable 
-          // to right child 
-          if (index < (i - 1) && arr[index] < arr[index + 1]) 
-            index++; 
-    
-          // if parent is smaller than child 
-          // then swapping parent with child 
-          // having higher value 
-          if (index < i && arr[j] < arr[index]) 
-            swap(arr, j, index);
-          j = index; 
-        } while (index < i); 
-      } 
-      for (int i = 0; i < heap.getArray().length; i++) {
-          System.out.print(heap.getArray()[i] + " ");
-      }
-      time.start();
-    } 
 }
