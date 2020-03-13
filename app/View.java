@@ -2,12 +2,10 @@ import java.awt.Font;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
 import javax.swing.JRadioButton;
+import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import java.awt.Color;
 
@@ -22,6 +20,7 @@ public class View extends JFrame {
 	private JRadioButton rdbtnNewRadioButton, rdbtnNewRadioButton_1,rdbtnNewRadioButton_2;
 	private JButton btnNewButton,btnNewButton_1;
 	private JLabel[] f;
+	private JTextArea textArea;
 	/**
 	 * Create the frame.
 	 */
@@ -370,16 +369,22 @@ public class View extends JFrame {
 		rdbtnNewRadioButton_2.setActionCommand("2");;
 		contentPane.add(rdbtnNewRadioButton_2);
 		
-		JTextArea textArea = new JTextArea("Array", 15,1);
-		textArea.setBounds(186, 345, 866, 334);
+		textArea = new JTextArea(15,1);
 		textArea.setLineWrap(true);
+		textArea.setEditable(false);
+		JScrollPane scrollPane = new JScrollPane(textArea);
+		scrollPane.setBounds(186, 345, 866, 334);
 		textArea.setFont(new Font("LucidaSans", Font.PLAIN, 25));
-		contentPane.add(textArea);
-
+		contentPane.add(scrollPane);
 		bGroup = new ButtonGroup();
 		bGroup.add(rdbtnNewRadioButton);
 		bGroup.add(rdbtnNewRadioButton_1);
 		bGroup.add(rdbtnNewRadioButton_2);
+	}
+
+	public void setPane(String text){
+		textArea.setText(text);
+		repaint();
 	}
 
 	public JLabel[] getLabels(){

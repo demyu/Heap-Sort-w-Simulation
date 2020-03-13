@@ -1,9 +1,7 @@
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Queue;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedList;
 import javax.swing.Timer;
 
 import javax.swing.JButton;
@@ -22,9 +20,9 @@ public class Controller implements ActionListener {
     private Heap heap;
     private Float timeSpeed;
     private double[] oldLocations;
-    private boolean isAnimating = true;
     private ArrayList<theQueue> queue;
-    private int globally = 0, globally_1 = 0;
+    private int globally = 0, globally_1 = -1;
+    private ArrayList<String> theText;
 
     public Controller() {
         this.heap = new Heap();
@@ -37,6 +35,9 @@ public class Controller implements ActionListener {
             view.repaint();
         }
         this.queue = new ArrayList<theQueue>();
+        this.theText = new ArrayList<String>();
+        theText.add(Arrays.toString(heap.getArray()));
+        setHistory(0);
     }
 
     public void actionPerformed(ActionEvent ae) {
@@ -152,8 +153,12 @@ public class Controller implements ActionListener {
 
     public void timerListener(ActionEvent e) {
             if(globally!=queue.size() ){
+                setHistory(globally);
                 theQueue q = queue.get(globally);
                 swapper(view.getLabels()[q.getI()], view.getLabels()[q.getK()], q.getOldValues(), q.getI(), q.getK());
+                
+            }else{
+                time.stop();
             }
     }
 
@@ -175,6 +180,7 @@ public class Controller implements ActionListener {
         while (rightBound > 0) {
          // Changing positions of the first and the last elements
          array = swap(0, rightBound - 1, array);
+         theText.add("Swapping First And Last Elements");
          rightBound--;
          // Sifting new first element considering decremented right bound
          array = sift(0, array, rightBound);
@@ -187,7 +193,7 @@ public class Controller implements ActionListener {
         return array;
        }
       
-       public int[] sift(int index, int[] array, int rightBound) {
+    public int[] sift(int index, int[] array, int rightBound) {
         // Iterate while element has at least one child
         while (index * 2 + 1 < rightBound) {
          int leftChild = array[index * 2 + 1];
@@ -195,12 +201,15 @@ public class Controller implements ActionListener {
          // If left child is bigger than left and current element we need to
          // swap current with left child and go to the next iteration
          if (leftChild >= rightChild && leftChild > array[index]) {
+          theText.add("Swap " + array[index * 2 + 1] + " >= " + array[index]);
           array = swap(index, index * 2 + 1, array);
+          
           index = index * 2 + 1;
           continue;
          }
          // If right child is greater than current - swap and go to the next
          if (rightChild > array[index]) {
+          theText.add("Swap " + array[index * 2 + 2] + " > " + array[index]);
           array = swap(index, index * 2 + 2, array);
           index = index * 2 + 2;
           continue;
@@ -218,7 +227,6 @@ public class Controller implements ActionListener {
 
         oldLocations = new double[] { view.getLabels()[i1].getX(), view.getLabels()[i1].getY(),view.getLabels()[i2].getX(), view.getLabels()[i2].getY()};
         queue.add(new theQueue(i1, i2, oldLocations));
-        
         int temp = array[i1];
         array[i1] = array[i2];
         array[i2] = temp;
@@ -241,4 +249,14 @@ public class Controller implements ActionListener {
         System.out.println(" ");
         view.repaint();
     }
+
+    public void setHistory(int i){
+        String temp= "";
+        for (int j = 0; j < i+1; j++) {
+            temp += theText.get(j) + "\n";
+        }
+        view.setPane(temp);
+    }
+
 }
+
