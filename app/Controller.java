@@ -21,7 +21,7 @@ public class Controller implements ActionListener {
     private Float timeSpeed;
     private double[] oldLocations;
     private ArrayList<theQueue> queue;
-    private int globally = 0, globally_1 = -1;
+    private int globally = 0;
     private ArrayList<String> theText;
 
     public Controller() {
@@ -37,7 +37,7 @@ public class Controller implements ActionListener {
         this.queue = new ArrayList<theQueue>();
         this.theText = new ArrayList<String>();
         theText.add(Arrays.toString(heap.getArray()));
-        setHistory(0);
+        setHistory();
     }
 
     public void actionPerformed(ActionEvent ae) {
@@ -45,7 +45,16 @@ public class Controller implements ActionListener {
         if (source.getText().equals("Randomize")) {
             view.getButtons()[0].setEnabled(true);
             this.heap = new Heap();
+            globally =0;
+            theText.clear();
+            queue.clear();
             view.initialize(heap.getArray().length);
+            theText.add(Arrays.toString(heap.getArray()));
+            setHistory();
+            view.repaint();
+            System.out.print(theText.toString());
+            
+            
             for (int i = 0; i < heap.getArray().length; i++) {
                 view.getLabels()[i].setText(Integer.toString(heap.getArray()[i]));
                 Dimension d = new Dimension(120, 16);
@@ -63,7 +72,6 @@ public class Controller implements ActionListener {
                 });
                 heapSort(heap.getArray());
                 // Todo
-
                 view.getButtons()[1].setText("Stop");
                 view.getButtons()[0].setEnabled(false);
             } catch (Exception e) {
@@ -156,9 +164,9 @@ public class Controller implements ActionListener {
                 setHistory(globally);
                 theQueue q = queue.get(globally);
                 swapper(view.getLabels()[q.getI()], view.getLabels()[q.getK()], q.getOldValues(), q.getI(), q.getK());
-                
             }else{
                 time.stop();
+                setHistory();
             }
     }
 
@@ -179,17 +187,13 @@ public class Controller implements ActionListener {
         int rightBound = array.length;
         while (rightBound > 0) {
          // Changing positions of the first and the last elements
-         array = swap(0, rightBound - 1, array);
          theText.add("Swapping First And Last Elements");
+         array = swap(0, rightBound - 1, array);
          rightBound--;
          // Sifting new first element considering decremented right bound
          array = sift(0, array, rightBound);
         }
         time.start();
-        System.out.println(Arrays.toString(array));
-        for (int i = 0; i < queue.size(); i++) {
-            queue.get(i).toStr();
-        }
         return array;
        }
       
@@ -238,15 +242,10 @@ public class Controller implements ActionListener {
         for (int i = 0; i < k.length; i++) {
             k[i] = view.getLabels()[i];
         }
-
-        System.out.print(k[i1].getText());
         JLabel lTemp = k[i1];
         k[i1]=k[i2];
-        System.out.print(k[i1].getText());
         k[i2]=lTemp;
         view.setLabels(k);
-
-        System.out.println(" ");
         view.repaint();
     }
 
@@ -255,6 +254,15 @@ public class Controller implements ActionListener {
         for (int j = 0; j < i+1; j++) {
             temp += theText.get(j) + "\n";
         }
+        view.setPane(temp);
+    }
+
+    public void setHistory(){
+        String temp= "";
+        for (int j = 0; j < globally; j++) {
+            temp += theText.get(j) + "\n";
+        }
+        temp+=Arrays.toString(heap.getArray());
         view.setPane(temp);
     }
 
