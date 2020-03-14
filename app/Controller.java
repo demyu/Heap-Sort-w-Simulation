@@ -54,7 +54,7 @@ public class Controller implements ActionListener {
             }
         } else if (source.getText().equals("Start")) {
             try {
-                // TODO add the sorting here
+                // TODO Sorting here
                 timeSpeed = Float.parseFloat(view.getJRadioButton());
                 time = new Timer((int) (timeSpeed * 10), new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
