@@ -167,6 +167,9 @@ public class Controller implements ActionListener {
             }else{
                 time.stop();
                 setHistory();
+                view.getButtons()[0].setEnabled(true);
+                view.getButtons()[1].setText("Start");
+                view.getButtons()[1].setEnabled(false);
             }
     }
 
