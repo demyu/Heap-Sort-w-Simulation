@@ -52,9 +52,6 @@ public class Controller implements ActionListener {
             theText.add(Arrays.toString(heap.getArray()));
             setHistory();
             view.repaint();
-            System.out.print(theText.toString());
-            
-            
             for (int i = 0; i < heap.getArray().length; i++) {
                 view.getLabels()[i].setText(Integer.toString(heap.getArray()[i]));
                 Dimension d = new Dimension(120, 16);
